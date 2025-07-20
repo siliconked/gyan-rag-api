@@ -102,28 +102,3 @@ async def ask_question(query: Query):
         return {"answer": final_answer}
     except Exception as e:
         return {"error": str(e)}
-
-import time
-from datetime import datetime
-
-@app.post("/ask")
-async def ask_question(query: Query):
-    try:
-        start = time.time()
-        rag_result = rag_chain.invoke(query.question)
-        final_answer = followup_chain.invoke({"rag_output": rag_result})
-        end = time.time()
-
-        response_time = round(end - start, 2)
-
-        # Print/log to console or file
-        print(f"[{datetime.now()}] Question: {query.question}")
-        print(f"Response Time: {response_time}s")
-        print(f"Answer: {final_answer[:200]}...\n")
-
-        # Store this query-response pair (see next step)
-        store_log(query.question, final_answer, response_time)
-
-        return {"answer": final_answer, "latency": response_time}
-    except Exception as e:
-        return {"error": str(e)}
